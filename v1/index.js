@@ -1,0 +1,27 @@
+import express from 'express';
+import cors from 'cors';
+import dotenv from 'dotenv';
+import cookieParser from 'cookie-parser';
+import helmet from 'helmet';
+import bodyParser from 'body-parser';
+import morgan from 'morgan';
+import viewEngine from './configs/viewEngine.js';
+import routes from './routes/index.js';
+import client from './configs/connectRedis.js';
+import connectDB from './configs/connectDB.js';
+dotenv.config();
+const port = process.env.PORT || 4000;
+const app = express();
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }));
+app.use(cors());
+app.use(helmet());
+app.use(cookieParser());
+app.use(morgan("dev"));
+viewEngine(app);
+routes(app);
+(async() =>{
+    await client.set('name', 'TranDung');
+})();
+connectDB();
+app.listen(port, () => console.log(`Server listening on http://localhost:${port}`));
